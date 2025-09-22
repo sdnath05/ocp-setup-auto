@@ -1,0 +1,12 @@
+
+- name: Initialize OCP Service
+  hosts: "{{ v_host | default('ocp-svc') }}"
+  user: ocp
+  become: yes
+  vars:
+    hostmachine: "{{ v_host | default('ocp-svc') }}"
+  roles:
+    - role: ocp-configure-coreos-install
+
+
+# ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/hosts -e "v_host=ocp-svc" coreos-boot-create.yaml -kK -vv

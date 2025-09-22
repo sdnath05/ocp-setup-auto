@@ -1,0 +1,61 @@
+apiVersion: v1
+baseDomain: ocp.local
+# proxy:
+#   # httpProxy: http://<username>:<pswd>@<ip>:<port>
+#   httpProxy: http://192.168.56.1:3128/
+#   httpsProxy: http://192.168.56.1:3128/
+#   noProxy: "127.0.0.1,registry.ocp.local:7443,registry.ocp.local"
+compute: 
+  - hyperthreading: Enabled 
+    name: worker
+    replicas: 0 # Must be set to 0 for User Provisioned Installation as worker nodes will be manually deployed.
+controlPlane: 
+  hyperthreading: Enabled 
+  name: master
+  replicas: 3 
+metadata:
+  name: cluster # Cluster name
+networking:
+  clusterNetwork:
+    - cidr: 10.128.0.0/14 
+      hostPrefix: 23 
+  networkType: OVNKubernetes 
+  serviceNetwork: 
+    - 172.30.0.0/16
+platform:
+  none: {} 
+fips: false 
+pullSecret: '<pull-secret>' 
+sshKey: '<ssh-key-public-key>'
+additionalTrustBundle: '<Need To Replace with multi-line content>'
+# imageContentSources: # OR # 
+imageDigestSources:
+  - mirrors:
+    - registry.ocp.local:7443/ocp4/openshift/release-images
+    - registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-release
+    source: quay.io/openshift-release-dev/ocp-release
+  - mirrors:
+    - registry.ocp.local:7443/ocp4/openshift/release
+    - registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+  - mirrors:
+    - registry.ocp.local:7443/ocp4/redhat/certified-operator-index
+    source: registry.redhat.io/redhat/certified-operator-index
+  - mirrors:
+    - registry.ocp.local:7443/ocp4/redhat/community-operator-index
+    source: registry.redhat.io/redhat/community-operator-index
+  - mirrors:
+    - registry.ocp.local:7443/ocp4/redhat/redhat-operator-index
+    source: registry.redhat.io/redhat/redhat-operator-index
+  - mirrors:
+    - registry.ocp.local:7443/ocp4/redhat/redhat-marketplace-index
+    source: registry.redhat.io/redhat/redhat-marketplace-index
+  - mirrors:
+    - registry.ocp.local:7443/ocp4/nginx/nginx-ingress-operator
+    source: quay.io/nginx/nginx-ingress-operator
+  - mirrors:
+    - registry.ocp.local:7443/ocp4/nginx/nginx-ingress-operator-bundle
+    source: registry.connect.redhat.com/nginx/nginx-ingress-operator-bundle
+
+# to update the mirror images path later
+# oc edit imagedigestmirrorset default -o yaml

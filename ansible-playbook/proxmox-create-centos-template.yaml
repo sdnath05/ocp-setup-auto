@@ -1,0 +1,18 @@
+- hosts: "{{ v_host | default('unknown') }}"
+  user: root
+  become: yes
+  vars:
+    hostmachine: "{{ v_host | default('pve1') }}"
+    vm_id: 8000
+    vm_name: "centos-9-cloudimg"
+    vm_memory: 1024
+    cpu_type: "host"
+    cpu_cores: 1
+    disk_size: "32"
+    user: "ocp"
+    password: "Pass@123"
+    mac: "BC:24:11:C6:26:65"
+  roles:
+    - role: proxmox-create-template
+
+# ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/hosts -e "v_host=pve2" proxmox-create-centos-template.yaml -kK -vv

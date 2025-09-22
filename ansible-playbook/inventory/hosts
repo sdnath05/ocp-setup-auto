@@ -1,0 +1,17 @@
+[ocp-svc]
+192.168.0.16
+
+[pve1]
+192.168.0.140
+
+[pve3]
+192.168.0.142
+
+[proxmox-servers]
+192.168.0.140
+192.168.0.142
+
+[all-proxmox-servers]
+pve1 ansible_host=192.168.0.140 ansible_user=root ansible_password=Asdf@135
+# pve2 ansible_host=192.168.0.141 ansible_user=root ansible_password=Asdf@135
+pve3 ansible_host=192.168.0.142 ansible_user=root ansible_password=Asdf@135

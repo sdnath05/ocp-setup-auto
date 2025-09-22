@@ -1,0 +1,124 @@
+- name: "Downloading the rchos cloud minimal image file in {{ hostmachine }}"
+  become: yes
+  get_url:
+    url: https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.19/latest/rhcos-4.19.0-x86_64-qemu.x86_64.qcow2.gz
+    dest: /root/rhcos-4.19.0-x86_64-qemu.x86_64.qcow2.gz
+    mode: '0644'
+  tags:
+    - download_image
+
+- name: "Downloading files {{ ocp_version }}"
+  become: yes
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    timeout: 300
+  loop:
+    - url: https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.19/latest/rhcos-4.19.0-x86_64-live-initramfs.x86_64.img
+      dest: /root/rhcos-4.19.0-x86_64-live-initramfs.x86_64.img
+      mode: '0644'
+    - url: https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.19/latest/rhcos-4.19.0-x86_64-live-rootfs.x86_64.img
+      dest: /root/rhcos-4.19.0-x86_64-live-rootfs.x86_64.img
+      mode: '0644'
+    - url: https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.19/latest/rhcos-4.19.0-x86_64-live-kernel.x86_64
+      dest: /root/rhcos-4.19.0-x86_64-live-kernel.x86_64
+      mode: '0644'
+  tags:
+    - download_kernel_file
+
+- name: Creating VM
+  become: yes
+  shell: |
+    cd /root
+    ls /root | egrep "rhcos-4.19.0-x86_64-qemu.x86_64.qcow2$" || gunzip /root/rhcos-4.19.0-x86_64-qemu.x86_64.qcow2.gz
+
+    qm create {{ vm_id }} \
+      --name {{ vm_name }} \
+      --memory {{ vm_memory }} \
+      --agent 1 \
+      --boot "order=scsi0;ide1" \
+      --scsihw virtio-scsi-pci \
+      --cpu {{ cpu_type }} --cores {{ cpu_cores }} \
+      --ide1 local-lvm:cloudinit \
+      --net0 virtio={{ mac }},bridge=ocp
+
+- name: Setting serial vga
+  become: yes
+  shell: |
+    # import the downloaded disk to the local-lvm storage, attaching it as a SCSI drive
+    qm set {{ vm_id }} --serial0 socket --vga serial0
+  when: set_vga is defined
+  tags:
+    - resizing_image
+
+- name: Resizing and importing disk
+  become: yes
+  shell: |
+    qemu-img resize /root/rhcos-4.19.0-x86_64-qemu.x86_64.qcow2 50G
+
+    # import the downloaded disk to the local-lvm storage, attaching it as a SCSI drive
+    qm set {{ vm_id }} --scsi0 local-lvm:0,import-from=/root/rhcos-4.19.0-x86_64-qemu.x86_64.qcow2,discard=on
+  tags:
+    - resizing_image
+
+- name: "Creating qemu-guest-agent-rchos-master-{{ vm_id }}.yaml snipet"
+  become: yes
+  shell: |
+    cat > /var/lib/vz/snippets/qemu-guest-agent-rchos-master-{{ vm_id }}.yaml << EOF
+    #cloud-config
+    runcmd:
+      - sudo coreos-installer install /dev/sda -I http://192.168.56.2:8083/ocp-setup/master.ign --insecure-ignition --copy-network
+      - reboot
+    EOF
+  tags:
+    - create_qemu_master_agent_file
+
+- name: "Creating qemu-guest-agent-rchos-bootstrap-{{ vm_id }}.yaml snipet"
+  become: yes
+  shell: |
+    cat > /var/lib/vz/snippets/qemu-guest-agent-rchos-bootstrap-{{ vm_id }}.yaml << EOF
+    #cloud-config
+    runcmd:
+      - sudo coreos-installer install /dev/sda -I http://192.168.56.2:8083/ocp-setup/bootstrap.ign --insecure-ignition --copy-network
+      - reboot
+    EOF
+  tags:
+    - create_qemu_bootstrap_agent_file
+
+- name: "Creating qemu-guest-agent-rchos-worker-{{ vm_id }}.yaml snipet"
+  become: yes
+  shell: |
+    cat > /var/lib/vz/snippets/qemu-guest-agent-rchos-worker-{{ vm_id }}.yaml << EOF
+    #cloud-config
+    runcmd:
+      - sudo coreos-installer install /dev/sda -I http://192.168.56.2:8083/ocp-setup/worker.ign --insecure-ignition --copy-network
+      - reboot
+    EOF
+  tags:
+    - create_qemu_worker_agent_file
+
+- name: Configuring cloud-init configs
+  become: yes
+  shell: |
+    pass=$(openssl passwd -6 {{ password }})
+    echo "Password: ${pass}"
+    qm set {{ vm_id }} --tags rchos-template,4.19,cloudinit
+    # qm set {{ vm_id }} --cicustom "vendor=snippets:snippets/qemu-guest-agent-rchos-bootstrap-{{ vm_id }}.yaml"
+    # qm set {{ vm_id }} --ciuser {{ user }}
+    # qm set {{ vm_id }} --cipassword ${pass}
+    # qm set {{ vm_id }} --sshkeys ~/.ssh/authorized_keys
+    # qm set {{ vm_id }} --ipconfig0 ip=dhcp
+
+- name: Creating the template
+  become: yes
+  shell: |
+    qm template {{ vm_id }}
+
+- name: Delete template
+  become: yes
+  shell: |
+    qm destroy {{ vm_id }} -skiplock -purge
+  when: del_template is defined
+  tags:
+    - del_template

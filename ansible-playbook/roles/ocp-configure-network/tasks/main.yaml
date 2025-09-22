@@ -1,0 +1,83 @@
+- name: Installing packages
+  include_tasks: reusable/ubuntu/install.yaml
+  vars:
+    packages:
+      - network-manager
+      - firewalld
+
+- name: "Copying {{ item.src }}"
+  become: yes
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - src: "../files/00-installer-config.yaml"
+      dest: "/etc/netplan/"
+      mode: "0600"
+    - src: "../files/50-cloud-init.yaml"
+      dest: "/etc/netplan/"
+      mode: "0600"
+    - src: "../files/90-NM-626dd384-8b3d-3690-9511-192b2c79b3fd.yaml"
+      dest: "/etc/netplan/"
+      mode: "0600"
+    - src: "../files/90-NM-cb177419-4682-353f-b54c-7d4f2bd80f64.yaml"
+      dest: "/etc/netplan/"
+      mode: "0600"
+    - src: "../files/NetworkManager.conf"
+      dest: "/etc/NetworkManager/"
+      mode: "0600"
+
+- name: "Creating and backing up the files"
+  become: yes
+  shell: |
+    [ -d /var/run/network ] || mkdir -p /var/run/network
+    [ -f /var/run/network/ifstate ] || touch /var/run/network/ifstate
+
+    [ -f /usr/lib/NetworkManager/conf.d/10-globally-managed-devices.conf ] && \
+    cp /usr/lib/NetworkManager/conf.d/10-globally-managed-devices.conf /usr/lib/NetworkManager/conf.d/10-globally-managed-devices.conf.bak && \
+    rm /usr/lib/NetworkManager/conf.d/10-globally-managed-devices.conf
+
+    [ -f /etc/NetworkManager/NetworkManager.conf ] && \
+    cp /etc/NetworkManager/NetworkManager.conf /etc/NetworkManager/NetworkManager.conf.bak
+
+    sed -i -e "s/<change-me>/$(date +%s)/g" /etc/netplan/90-NM-626dd384-8b3d-3690-9511-192b2c79b3fd.yaml
+
+- name: "Applying changes and restarting the network"
+  become: yes
+  shell: |
+    netplan apply
+    sleep 2s
+    systemctl restart NetworkManager
+    systemctl status NetworkManager
+
+- name: "Setting internal and external zone and setting masquerade"
+  become: yes
+  shell: |
+    nmcli connection modify netplan-{{ ocp_ethernet }} connection.zone internal
+    nmcli connection modify netplan-{{ internet_ethernet }} connection.zone external
+    sudo systemctl restart NetworkManager
+
+    systemctl disable systemd-networkd-wait-online.service
+
+    echo "Adding the masquerade for both external and internal zones"
+    firewall-cmd --zone=external --add-masquerade --permanent
+    firewall-cmd --zone=internal --add-masquerade --permanent
+    firewall-cmd --reload
+  tags:
+    - set_zones
+
+- name: "Checking the active zones"
+  become: yes
+  shell: |
+    echo "Checking the active zones"
+    firewall-cmd --get-active-zones
+
+    # Check the current settings of each zone
+    firewall-cmd --list-all --zone=internal
+    firewall-cmd --list-all --zone=external
+  tags:
+    - check_active_zones
+
+    
+

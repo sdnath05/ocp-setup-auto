@@ -1,0 +1,116 @@
+- name: Installing packages
+  include_tasks: reusable/ubuntu/install.yaml
+  vars:
+    packages:
+      - podman
+      - jq
+      - skopeo
+
+- name: "Creating the ssl files"
+  become: yes
+  shell: |
+    openssl req -x509 \
+      -sha256 -days 3650 \
+      -nodes \
+      -newkey rsa:2048 \
+      -subj "/C=IN/ST=West Bengal/L=Kolkata/O=XYZ Ltd./OU=Developement/CN=ocp.local/emailAddress=admin@subratadebnath.in" \
+      -addext "subjectAltName=DNS:*.ocp.local,DNS:cluster.ocp.local,DNS:*.cluster.ocp.local,DNS:apps.cluster.ocp.local,DNS:*.apps.cluster.ocp.local" \
+      -keyout /ocp/data/ssl/ocp.key -out /ocp/data/ssl/ocp.crt
+
+    openssl req -x509 \
+      -sha256 -days 3650 \
+      -nodes \
+      -newkey rsa:2048 \
+      -subj "/C=IN/ST=West Bengal/L=Kolkata/O=XYZ Ltd./OU=Developement/CN=*.ocp.local/emailAddress=admin@subratadebnath.in" \
+      -addext "subjectAltName=DNS:*.ocp.local,DNS:cluster.ocp.local,DNS:*.cluster.ocp.local,DNS:apps.cluster.ocp.local,DNS:*.apps.cluster.ocp.local" \
+      -keyout /ocp/data/ssl/ocp-registry.key -out /ocp/data/ssl/ocp-registry.crt
+  when: create_ssl is defined
+
+- name: "Verifing the certificates"
+  become: yes
+  shell: |
+    # For verify the crt file
+    openssl x509 -in /ocp/data/ssl/ocp.crt -text -noout
+    # For verify the key file
+    openssl rsa -in /ocp/data/ssl/ocp.key -check
+
+- name: "Copying the certificate file and applying"
+  become: yes
+  shell: |
+    firewall-cmd --add-port=7443/tcp --zone=internal --permanent # kube-api-server on control plane nodes
+    firewall-cmd --add-port=7443/tcp --zone=external --permanent # kube-api-server on control plane nodes
+    firewall-cmd --reload
+    
+    cp /ocp/data/ssl/ocp-registry.crt /usr/local/share/ca-certificates
+    cp /ocp/data/ssl/ocp.crt /usr/local/share/ca-certificates
+    update-ca-certificates
+
+    awk -v cmd='openssl x509 -noout -subject' '/BEGIN/{close(cmd)};{print | cmd}' < /etc/ssl/certs/ca-certificates.crt
+
+- name: Uninstall mirror registry
+  become: yes
+  shell: |
+    echo -n "y" | {{ bin_path }}/mirror-registry uninstall -v
+
+    podman pod kill `podman pod ps -q`
+    sleep 1s
+    podman pod rm `podman pod ps -q`
+    sleep 2s
+    podman rmi `podman images -q`
+
+    rm -rf ocp/registry/quayroot/*
+    rm -rf /ocp/registry/quaystorage/*
+    rm -rf /ocp/registry/sqlitestorage/*
+  when: remove_mirror is defined
+  tags:
+    - delete_mirror_registry
+
+- name: "Creating the Mirror Registry"
+  become: yes
+  shell: |
+    {{ bin_path }}/mirror-registry install \
+      --sslKey /ocp/data/ssl/ocp-registry.key \
+      --sslCert /ocp/data/ssl/ocp-registry.crt \
+      --quayHostname {{ quay_host_name }} \
+      --quayRegistryServicePort {{ quay_host_port }} \
+      --quayRoot /ocp/registry/quayroot \
+      --quayStorage /ocp/registry/quaystorage \
+      --sqliteStorage /ocp/registry/sqlitestorage \
+      --initUser "{{ registry_user }}" \
+      --initPassword "{{ registry_pass }}" \
+      --verbose
+  tags:
+    - create_mirror_registry
+
+- name: "Generating the pull-secret.json"
+  become: yes
+  shell: |
+    cd {{ script_dir }}
+    python3 main.py
+  tags:
+    - run_python_scripts
+
+- name: "Updating pull-secret.json with registry username and password"
+  become: yes
+  shell: |
+    cd {{ script_dir }}
+    python3 updatePullSecret.py -u {{ registry_user }} -p {{ registry_pass }} -d /ocp
+  tags:
+    - run_python_scripts
+
+- name: "Logging into registry using podman"
+  become: yes
+  shell: |
+    mkdir -p {{ XDG_RUNTIME_DIR }}/containers
+    mkdir /root/.docker
+
+    cat /ocp/pull-secret.json | jq > {{ XDG_RUNTIME_DIR }}/containers/auth.json
+    cat /ocp/pull-secret.json | jq > /root/.docker/config.json
+
+    podman login \
+      -u {{ registry_user }} \
+      -p "{{ registry_pass }}" \
+      --authfile /ocp/pull-secret.json \
+      {{ quay_host_name }}:7443
+  tags:
+    - run_python_scripts

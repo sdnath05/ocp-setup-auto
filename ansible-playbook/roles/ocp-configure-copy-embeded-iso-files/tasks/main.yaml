@@ -1,0 +1,12 @@
+- name: "Downloading embeded iso files to proxmox servers"
+  become: yes
+  shell: |
+    rm -rf /var/lib/vz/template/iso/rhcos-4.19.0-x86_64-live-iso-{{ item }}.iso
+  
+    wget -P /var/lib/vz/template/iso http://192.168.0.16:8083/rchos/rhcos-4.19.0-x86_64-live-iso-{{ item }}.iso
+  loop:
+    - bootstrap
+    - master
+    - worker
+  tags:
+    - generate_ocp_iso_files

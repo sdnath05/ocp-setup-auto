@@ -1,0 +1,35 @@
+- name: Initialize OCP Service
+  hosts: "{{ v_host | default('ocp-svc') }}"
+  user: ocp
+  become: yes
+  vars:
+    hostmachine: "{{ v_host | default('ocp-svc') }}"
+    registry_user: "admin"
+    registry_pass: "RandomKey135" # not all password combinations work
+    ocp_ethernet: "ens19"
+    internet_ethernet: "eth0"
+    ssh_file_path: "/root/.ssh/id_rsa"
+    quay_host_name: "registry.ocp.local"
+    quay_host_port: "7443"
+    bin_path: "/usr/local/bin"
+    OFFLINE_ACCESS_TOKEN: "{{ lookup('env', 'OFFLINE_ACCESS_TOKEN') }}"
+    script_dir: /ocp/installer/python-scripts
+    XDG_RUNTIME_DIR: "/ocp/data/mirror"
+    ocp_version: "4.19.4" # Use '4.19.4' for a specific version or 'stable' for the latest stable release.
+    isDocker: true
+  roles:
+    - role: ocp-initialize
+    - role: ocp-configure-network
+    - role: ocp-configure-squid
+    - role: ocp-configure-dns
+    - role: ocp-configure-dhcp
+    - role: ocp-configure-nginx
+    - role: ocp-configure-haproxy
+    - role: ocp-configure-nfs
+    - role: ocp-configure-mirror-registry
+      when: not isDocker
+    - role: ocp-configure-docker-harbor
+      when: isDocker
+
+
+# ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/hosts -e "v_host=ocp-svc" init-ocp-svc.yaml -kK -vv

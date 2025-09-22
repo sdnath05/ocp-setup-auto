@@ -1,0 +1,20 @@
+- hosts: "{{ v_host | default('unknown') }}"
+  user: root
+  become: yes
+  vars:
+    hostmachine: "{{ v_host | default('pve2') }}"
+    vm_id: 9000
+    vm_name: "ubuntu-2404-cloudimg"
+    vm_memory: 1024
+    cpu_type: "host"
+    cpu_cores: 1
+    disk_size: "32"
+    user: "ocp"
+    password: "Pass@123"
+    mac: "BC:24:11:C6:26:65"
+    is_data_disk: false
+    data_disk_id: "nvme-CT1000E100SSD8_2523EAD4658C"
+  roles:
+    - role: proxmox-create-template
+
+# ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/hosts -e "v_host=pve2" proxmox-create-ubuntu-template.yaml -kK -vv

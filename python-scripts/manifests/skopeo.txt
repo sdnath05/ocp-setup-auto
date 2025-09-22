@@ -1,0 +1,339 @@
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9dd26dfd4999554ae5f919d1ecebee723b2a910c521a8f327753542f1bfa35f3 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:9dd26dfd4999554ae5f919d1ecebee723b2a910c521a8f327753542f1bfa35f3
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b5f51cf0737ac6c9441c2516501e2d3204f37ef5762b6958624ba1ae26bda9e0 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:b5f51cf0737ac6c9441c2516501e2d3204f37ef5762b6958624ba1ae26bda9e0
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:54aca114e6a6054cafa1806857fd8f596c44528d7741f8a24cfe0565e96a7720 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:54aca114e6a6054cafa1806857fd8f596c44528d7741f8a24cfe0565e96a7720
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cba77a0a0596d3e1572f650b85f1951509d4483fed59c7477a5c53388b38bfe8 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:cba77a0a0596d3e1572f650b85f1951509d4483fed59c7477a5c53388b38bfe8
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:5e3b055e2a59d51d9c3c3bbd08b4e1b6f44428e3b472f4edb9193a396076e6e5 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:5e3b055e2a59d51d9c3c3bbd08b4e1b6f44428e3b472f4edb9193a396076e6e5
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:dfe314410fc846533df830b0483dd5d23c6df553fe4c6dd46d90dc1bdc32a5cd \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:dfe314410fc846533df830b0483dd5d23c6df553fe4c6dd46d90dc1bdc32a5cd
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:82d6bd39adea2037ef5d6bd79f21963688123f4c0c9d60add494bacc3a6dac6b \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:82d6bd39adea2037ef5d6bd79f21963688123f4c0c9d60add494bacc3a6dac6b
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:c9207d6b3e1aeffc3cbaf429f27562fcd314c583435669a49e47025ddc8d4a33 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:c9207d6b3e1aeffc3cbaf429f27562fcd314c583435669a49e47025ddc8d4a33
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1e970bd6fd04816a1dbbd0bca85b311d13efbe35382721e3e1854c6cc7284cdb \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:1e970bd6fd04816a1dbbd0bca85b311d13efbe35382721e3e1854c6cc7284cdb
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d56a9d1368ba23cb34cbe1be8368cde78a53f325bca21f14202d00a7f728a207 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:d56a9d1368ba23cb34cbe1be8368cde78a53f325bca21f14202d00a7f728a207
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:abdf249c8fc90c5ee90bec5ee23400a44bb5144a26ed0fa920c2a389c2d69a2a \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:abdf249c8fc90c5ee90bec5ee23400a44bb5144a26ed0fa920c2a389c2d69a2a
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:82ab9a8e62635af12e3853db084eaddcd39d1e3ef8b4d93a80031ba213e45c14 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:82ab9a8e62635af12e3853db084eaddcd39d1e3ef8b4d93a80031ba213e45c14
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d4096d95230da6239d39529820c828ea3e6dd4bc58041a6a8da82111dd1beee7 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:d4096d95230da6239d39529820c828ea3e6dd4bc58041a6a8da82111dd1beee7
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:f46c5dd83a53cdda8e4fddffc2e4eb02b3135b0105466f1c230687eb90da9171 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:f46c5dd83a53cdda8e4fddffc2e4eb02b3135b0105466f1c230687eb90da9171
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:f2bf41d5340259a8c87468b8fa161ff772430881a27d620ad9c439f9bc3fcae5 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:f2bf41d5340259a8c87468b8fa161ff772430881a27d620ad9c439f9bc3fcae5
+-------------------------------------master---------------------------------    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:74814fe2da64c8e3b865dbc06983b88f484b52c4c135f836fd298705ab8cb0cb \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:74814fe2da64c8e3b865dbc06983b88f484b52c4c135f836fd298705ab8cb0cb
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9bfdad6faaf0d761917fc83a0dee8125a465d2b7086d28aefef7d6d8a4ba30ea \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:9bfdad6faaf0d761917fc83a0dee8125a465d2b7086d28aefef7d6d8a4ba30ea
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3d3333285fd6736d11ea830fb7fe1f2b8d3e304d682a876458e18eb1173f271d \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:3d3333285fd6736d11ea830fb7fe1f2b8d3e304d682a876458e18eb1173f271d
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:23282cea5d03b75fa44676a62225dbd42f0ad89ecd64b575c37aa211049b091c \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:23282cea5d03b75fa44676a62225dbd42f0ad89ecd64b575c37aa211049b091c
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:ef36d2db5aeb777d70f98b3c158568a4b6d02feed566e866c837cc3c891b4af1 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:ef36d2db5aeb777d70f98b3c158568a4b6d02feed566e866c837cc3c891b4af1
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3885f373b2695282877fc8237df256021c876e216d6f57bfa26a14b27b35ca1a \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:3885f373b2695282877fc8237df256021c876e216d6f57bfa26a14b27b35ca1a
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6c0585bf0ef5b2f480786fd3595b47b696fc92765ed126570042603d34147715 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:6c0585bf0ef5b2f480786fd3595b47b696fc92765ed126570042603d34147715
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:27250cfd5fab6e5c964199782a14efa9da45883dd4efbf7106c6bfbac51f55d9 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:27250cfd5fab6e5c964199782a14efa9da45883dd4efbf7106c6bfbac51f55d9
+    
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:51434ca774941ca58d2ffd3184232135dfd7b4d7dbee652b39e7b2c2d90865dd \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:51434ca774941ca58d2ffd3184232135dfd7b4d7dbee652b39e7b2c2d90865dd
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2584e99610eeafd0364fd98f494ef8ff1e0545ed36adde0d586c0e74c7916fff \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:2584e99610eeafd0364fd98f494ef8ff1e0545ed36adde0d586c0e74c7916fff
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:debba67cfc362abad9a145336525b393346c283a70d400e0716cc5971512a41d \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:debba67cfc362abad9a145336525b393346c283a70d400e0716cc5971512a41d
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:40803dcb95077a9e2c2490cd00d8022edaaf936ff3cdeac43fe068bbcaf7421b \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:40803dcb95077a9e2c2490cd00d8022edaaf936ff3cdeac43fe068bbcaf7421b
+    
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:dc76d68eb46afba132eb443691b0f7aa9fae680223595b3e360f3e1f63600e35 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:dc76d68eb46afba132eb443691b0f7aa9fae680223595b3e360f3e1f63600e35
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:68078de43ae9875cc6b00b60d949a8418f33a9bf44993a007bc3b3cb9105fb78 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:68078de43ae9875cc6b00b60d949a8418f33a9bf44993a007bc3b3cb9105fb78
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d1d78b9ced83463d45b2961a1090e6ae31e72f083eba2847291176289d1f0e81 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:d1d78b9ced83463d45b2961a1090e6ae31e72f083eba2847291176289d1f0e81
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:feab7402581ec881312aa74ba8fa90b3f673d264a05f07f0a0cb0fdbf705c69a \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:feab7402581ec881312aa74ba8fa90b3f673d264a05f07f0a0cb0fdbf705c69a
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:d131219cef4e493ca1e1c95bacb9778af7c920da12746e1497cb0f38ab21fd1b \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:d131219cef4e493ca1e1c95bacb9778af7c920da12746e1497cb0f38ab21fd1b
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cb834b49552e598104f97000d883ca1429dbb43d285a2a82e77832a1df83d941 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:cb834b49552e598104f97000d883ca1429dbb43d285a2a82e77832a1df83d941
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b367f97a67baa54bf1379a9a864f9e2b081a60fa22288fb7a0ab7db878e3bc34 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:b367f97a67baa54bf1379a9a864f9e2b081a60fa22288fb7a0ab7db878e3bc34
+    
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:0d2829868e103274992a1566bd53b9d7fc4df54e5569e32b47963557a3675b45 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:0d2829868e103274992a1566bd53b9d7fc4df54e5569e32b47963557a3675b45
+   
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:32f7744fce03f65b4e48c1bd5ce11b2aa928f2641a90bb28416e4f0f3b352d24 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:32f7744fce03f65b4e48c1bd5ce11b2aa928f2641a90bb28416e4f0f3b352d24
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:72e3edf0296395af79be2f7a204919cdccd7431fe1565bb9991455a4a45245ee \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:72e3edf0296395af79be2f7a204919cdccd7431fe1565bb9991455a4a45245ee
+   
+
+
+
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:dfdf3a9c1ee3a6ce74566956721f3d37aca4c46e0f574aeaffc8f8aaf59e7339 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:dfdf3a9c1ee3a6ce74566956721f3d37aca4c46e0f574aeaffc8f8aaf59e7339
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:971174692a1aae68ac07ffa132254eb3c018a52507eb32621b6dc286fd25ca0d \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:971174692a1aae68ac07ffa132254eb3c018a52507eb32621b6dc286fd25ca0d
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:db8fe5395606f300c17542bf258e986e2ce15978ade341655dde51de355dd561 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:db8fe5395606f300c17542bf258e986e2ce15978ade341655dde51de355dd561
+   
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:595683a09702a48eac123f1a7709cc48742f01574b74c32a9cd41e5794d1de11 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:595683a09702a48eac123f1a7709cc48742f01574b74c32a9cd41e5794d1de11
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6fde855e06f0050771fda75c3daf0fa7a6b5422dc159cc5eafcc22c630e30e8d \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:6fde855e06f0050771fda75c3daf0fa7a6b5422dc159cc5eafcc22c630e30e8d
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:b1d79dd26fbbda54401a39c418058ed1342bd9254899ed9f38f8ce8007dbaf5b \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:b1d79dd26fbbda54401a39c418058ed1342bd9254899ed9f38f8ce8007dbaf5b
+   
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:e0bc7274e5343363af946d078f3af8a929c625b95be2dca2ad45526b944f9556 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:e0bc7274e5343363af946d078f3af8a929c625b95be2dca2ad45526b944f9556
+   
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:fe9c50d7c1df6cf6567e78802ef4b2a52065912a17b51a74e34892fcf3f92212 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:fe9c50d7c1df6cf6567e78802ef4b2a52065912a17b51a74e34892fcf3f92212
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:66fb90ab5ee7bf6b0ad976597f2881952eba04972a91c41f04f6079cf9583587 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:66fb90ab5ee7bf6b0ad976597f2881952eba04972a91c41f04f6079cf9583587
+       
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:f1bc1c927fa1d8ea305d89db9677eb23130c77f81cc01d46b5c642f367f451a2 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:f1bc1c927fa1d8ea305d89db9677eb23130c77f81cc01d46b5c642f367f451a2
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:9bda7cb0df7085c2d933b9cee5946304219c7a1572ea9d4ca22e0dc7bff75289 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:9bda7cb0df7085c2d933b9cee5946304219c7a1572ea9d4ca22e0dc7bff75289
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:6eca136336db6157df8d795345a6f21ace41d1d1bf04bd862d18876adb28d011 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:6eca136336db6157df8d795345a6f21ace41d1d1bf04bd862d18876adb28d011
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:09a847f4215f197ddf610417d438050f72aad6f47f76c8fa0f03589cb5a4827c \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:09a847f4215f197ddf610417d438050f72aad6f47f76c8fa0f03589cb5a4827c
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1b9b922c907130caa4f8c92afeeacb533cd000020e6369fa382d7a42ed1d6a48 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:1b9b922c907130caa4f8c92afeeacb533cd000020e6369fa382d7a42ed1d6a48
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:126486ff6f593fec478a97aba81f4bb711b3a2c527406a0b30cd9d7c3ba1765b \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:126486ff6f593fec478a97aba81f4bb711b3a2c527406a0b30cd9d7c3ba1765b
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:24dfa062b5f752051b26eeb3bcb2d641bcc50ad0370fd98ad4f0aef269f8bb14 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:24dfa062b5f752051b26eeb3bcb2d641bcc50ad0370fd98ad4f0aef269f8bb14
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:cda5bf2c8319cea688564a3461a239f31bc3635e96033a219007d68ea9cbcf4c \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:cda5bf2c8319cea688564a3461a239f31bc3635e96033a219007d68ea9cbcf4c
+
+skopeo copy \
+    --multi-arch all \
+    --preserve-digests \
+    docker://quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:4442669520e83453d0085c46850c3089bde965e4e63ad214a73cd7b7262de021 \
+    docker://registry.ocp.local:7443/ocp4/openshift-release-dev/ocp-v4.0-art-dev@sha256:4442669520e83453d0085c46850c3089bde965e4e63ad214a73cd7b7262de021
+
+    
+

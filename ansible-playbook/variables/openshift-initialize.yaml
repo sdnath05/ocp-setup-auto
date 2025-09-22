@@ -1,0 +1,3 @@
+v_host: "ocp-svc"
+generate_ign: true
+remote_user: "root"

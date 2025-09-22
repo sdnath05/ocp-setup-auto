@@ -1,0 +1,49 @@
+- name: "Generating the pull-secret"
+  become: yes
+  shell: |
+    cd {{ script_dir }}
+
+    python3 main.py
+
+- name: "Updating pull-secret.json"
+  become: yes
+  shell: |
+    cd {{ script_dir }}
+
+    python3 updatePullSecret.py -u {{ registry_user }} -p {{ registry_pass }} -d /ocp
+
+- name: "Cloning the quay openshift related images"
+  become: yes
+  shell: |
+    cd {{ bin_path }}
+
+    mkdir -p {{ XDG_RUNTIME_DIR }}/containers
+    OCP_RELEASE=$(oc version | grep "4.19" | awk '{print $3}')
+
+    podman login \
+      -u {{ registry_user }} \
+      -p "{{ registry_pass }}" \
+      --authfile /ocp/pull-secret.json \
+      --tls-verify=false \
+      {{ LOCAL_REGISTRY }}
+
+    oc adm release mirror \
+      -a {{ LOCAL_SECRET_JSON }} \
+      --from=quay.io/{{ PRODUCT_REPO }}/{{ RELEASE_NAME }}:$OCP_RELEASE-{{ ARCHITECTURE }} \
+      --to={{ LOCAL_REGISTRY }}/{{ LOCAL_REPOSITORY }}/{{ RELEASE_NAME }} \
+      --to-release-image={{ LOCAL_REGISTRY }}/{{ LOCAL_REPOSITORY }}/{{ RELEASE_NAME }}:$OCP_RELEASE-{{ ARCHITECTURE }} \
+      --print-mirror-instructions idms \
+      --insecure=true
+
+    # oc adm catalog mirror \
+    #   registry.redhat.io/redhat/redhat-operator-index:v4.19 \
+    #   registry.ocp.local:7443/ocp419/operators \
+    #   -a /ocp/pull-secret.json
+  register: clone_output
+
+- name: Saving the output to a file
+  become: yes
+  shell: |-
+    cat > /ocp/clone-output.txt << EOF
+    {{ clone_output.stdout }}
+    EOF

@@ -1,0 +1,25 @@
+- name: Installing packages
+  include_tasks: reusable/ubuntu/install.yaml
+  vars:
+    packages:
+      - nfs-kernel-server
+
+- name: "Applying changes"
+  become: yes
+  shell: |
+    cat >> /etc/exports << EOF
+
+    /ocp/data   192.168.56.0/24(rw,sync,no_subtree_check)
+    EOF
+
+    firewall-cmd --add-service=nfs --zone=internal --permanent
+    firewall-cmd --add-service=rpc-bind --zone=internal --permanent
+    firewall-cmd --reload
+    
+    echo -n "y" | ssh-keygen -q -b 4096 -t rsa -C "ocp-svc" -f {{ ssh_file_path }} -N ""
+
+- name: "Restarting the NFS service"
+  become: yes
+  shell: |
+    exportfs -ra
+    systemctl restart nfs-kernel-server

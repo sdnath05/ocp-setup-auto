@@ -1,0 +1,27 @@
+- name: Installing packages
+  include_tasks: reusable/ubuntu/install.yaml
+  vars:
+    packages:
+      - isc-dhcp-server
+
+- name: "Copying {{ item.src }}"
+  become: yes
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - src: "../files/dhcpd.conf"
+      dest: "/etc/dhcp/"
+      mode: "0644"
+
+- name: "Applying changes and restarting the dhcp server"
+  become: yes
+  shell: |
+    # allowing dhcp service to firewall
+    firewall-cmd --add-service=dhcp --zone=internal --permanent
+    firewall-cmd --reload
+
+    systemctl enable isc-dhcp-server
+    systemctl restart isc-dhcp-server
+    systemctl status isc-dhcp-server

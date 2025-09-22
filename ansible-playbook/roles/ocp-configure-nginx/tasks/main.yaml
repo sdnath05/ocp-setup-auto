@@ -1,0 +1,58 @@
+- name: Adding nginx ppa
+  include_tasks: reusable/ubuntu/addppa.yaml
+  vars:
+    package: "ppa:ondrej/nginx"
+
+- name: Installing packages
+  include_tasks: reusable/ubuntu/install.yaml
+  vars:
+    packages:
+      - nginx
+
+- name: "Copying {{ item.src }}"
+  become: yes
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - src: "../files/nginx.conf"
+      dest: "/etc/nginx/sites-available/default"
+      mode: "0644"
+
+- name: "Applying changes and fixing file permisions"
+  become: yes
+  shell: |
+    filepath="/ocp/ocp-setup"
+    chown -R $USER:www-data $filepath
+
+    # 750 permision to folder and 640 to files
+    find $filepath -type d -exec chmod u=rwx,g=rx,o= '{}' \;
+    find $filepath -type f -exec chmod u=rw,g=r,o= '{}' \;
+
+    filepath2="/ocp/rchos"
+    chown -R $USER:www-data $filepath2
+
+    # 750 permision to folder and 640 to files
+    find $filepath2 -type d -exec chmod u=rwx,g=rx,o= '{}' \;
+    find $filepath2 -type f -exec chmod u=rw,g=r,o= '{}' \;
+
+    # These files folders are not required for now
+    # find ./*/files -type d -exec chmod ug=rwx,o= '{}' \;
+    # find ./*/files -type f -exec chmod ug=rw,o= '{}' \;
+
+    firewall-cmd --add-port=8083/tcp --zone=internal --permanent
+    firewall-cmd --add-port=8083/tcp --zone=external --permanent
+    firewall-cmd --reload
+
+- name: "Starting the nginx"
+  become: yes
+  shell: |
+    systemctl enable nginx
+    systemctl start nginx    
+    systemctl status nginx
+    systemctl reload nginx    
+
+
+    
+

@@ -1,0 +1,91 @@
+- name: "Downloading the ubuntu cloud minimal image file in {{ hostmachine }}"
+  become: yes
+  get_url:
+    url: https://cloud-images.ubuntu.com/minimal/releases/noble/release/ubuntu-24.04-minimal-cloudimg-amd64.img
+    dest: /root/ubuntu-24.04-minimal-cloudimg-amd64.qcow2
+    mode: '0644'
+  tags:
+    - download_image
+
+- name: Creating VM
+  become: yes
+  shell: |
+    qm create {{ vm_id }} \
+      --name {{ vm_name }} \
+      --memory {{ vm_memory }} \
+      --agent 1 \
+      --boot "order=scsi0;ide1" \
+      --scsihw virtio-scsi-pci \
+      --cpu {{ cpu_type }} --cores {{ cpu_cores }} \
+      --ide1 local-lvm:cloudinit \
+      --net0 virtio={{ mac }},bridge=vmbr0
+
+- name: Setting serial vga
+  become: yes
+  shell: |
+    qemu-img resize /root/ubuntu-24.04-minimal-cloudimg-amd64.qcow2 32G
+
+    # import the downloaded disk to the local-lvm storage, attaching it as a SCSI drive
+    qm set {{ vm_id }} --serial0 socket --vga serial0
+  when: set_vga is defined
+  tags:
+    - resizing_image
+
+- name: Resizing and importing disk
+  become: yes
+  shell: |
+    qemu-img resize /root/ubuntu-24.04-minimal-cloudimg-amd64.qcow2 32G
+
+    # import the downloaded disk to the local-lvm storage, attaching it as a SCSI drive
+    qm set {{ vm_id }} --scsi0 local-lvm:0,import-from=/root/ubuntu-24.04-minimal-cloudimg-amd64.qcow2,discard=on
+  tags:
+    - resizing_image
+
+- name: "Creating qemu-guest-agent-ubuntu-{{ vm_id }}.yaml snipet"
+  become: yes
+  shell: |
+    cat > /var/lib/vz/snippets/qemu-guest-agent-ubuntu-{{ vm_id }}.yaml << EOF
+    #cloud-config
+    runcmd:
+      - apt update
+      - apt upgrade -y
+      - apt install -y build-essential rsyslog net-tools netcat-openbsd zip unzip
+      - apt install -y nano ca-certificates git acl iputils-ping
+      - apt install -y qemu-guest-agent
+      - systemctl restart qemu-guest-agent
+      - systemctl enable qemu-guest-agent
+      - systemctl status qemu-guest-agent
+      - reboot
+    users:
+      - name: ocp
+        shell: /bin/bash
+        sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    ssh_pwauth: True ## This line enables ssh password authentication
+    EOF
+  tags:
+    - create_qemu_guest_agent_file
+
+- name: Configuring cloud-init configs
+  become: yes
+  shell: |
+    pass=$(openssl passwd -6 {{ password }})
+    echo "Password: ${pass}"
+    qm set {{ vm_id }} --cicustom "vendor=snippets:snippets/qemu-guest-agent-ubuntu-{{ vm_id }}.yaml"
+    qm set {{ vm_id }} --tags ubuntu-template,24.04,cloudinit
+    qm set {{ vm_id }} --ciuser {{ user }}
+    qm set {{ vm_id }} --cipassword ${pass}
+    qm set {{ vm_id }} --sshkeys ~/.ssh/authorized_keys
+    qm set {{ vm_id }} --ipconfig0 ip=dhcp
+
+- name: Creating the template
+  become: yes
+  shell: |
+    qm template {{ vm_id }}
+
+- name: Delete template
+  become: yes
+  shell: |
+    qm destroy {{ vm_id }} -skiplock -purge
+  when: del_template is defined
+  tags:
+    - del_template

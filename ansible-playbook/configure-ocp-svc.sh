@@ -1,0 +1,1 @@
+ansible-playbook ./init-ocp-svc.yaml -e @variables/ocp-svc.yaml -vv

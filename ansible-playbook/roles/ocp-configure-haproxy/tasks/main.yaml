@@ -1,0 +1,43 @@
+- name: Installing packages
+  include_tasks: reusable/ubuntu/install.yaml
+  vars:
+    packages:
+      - haproxy
+
+- name: "Copying {{ item.src }}"
+  become: yes
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - src: "../files/haproxy.cfg"
+      dest: "/etc/haproxy/"
+      mode: "0644"
+
+- name: "Applying changes for haproxy"
+  become: yes
+  shell: |
+    firewall-cmd --add-port=3130/tcp --zone=internal --permanent # proxy hosted on helper node
+    firewall-cmd --add-service=http --zone=internal --permanent # web services hosted on worker nodes
+    firewall-cmd --add-service=http --zone=external --permanent # web services hosted on worker nodes
+    firewall-cmd --add-service=https --zone=internal --permanent # web services hosted on worker nodes
+    firewall-cmd --add-service=https --zone=external --permanent # web services hosted on worker nodes
+    firewall-cmd --add-port=6443/tcp --zone=internal --permanent # kube-api-server on control plane nodes
+    firewall-cmd --add-port=6443/tcp --zone=external --permanent # kube-api-server on control plane nodes
+    firewall-cmd --add-port=22623/tcp --zone=internal --permanent # machine-config server
+    firewall-cmd --add-port=9000/tcp --zone=external --permanent # HAProxy Stats
+    firewall-cmd --reload
+
+- name: "Starting the haproxy"
+  become: yes
+  shell: |
+    systemctl enable haproxy
+    systemctl start haproxy
+    systemctl restart haproxy
+    systemctl status haproxy
+
+
+
+    
+

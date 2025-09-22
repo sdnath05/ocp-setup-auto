@@ -1,0 +1,18 @@
+options {
+    directory "/var/cache/bind";
+
+    listen-on port 53 { 127.0.0.1; 192.168.56.2; };
+    listen-on-v6 { any; };
+    allow-query { localhost; 192.168.56.0/24; };
+    dnssec-validation yes;
+    # dnssec-enable yes;
+    # allow-transfer {none;};
+    recursion yes;
+    auth-nxdomain no;    # conform to RFC1035
+
+    # Using Google DNS
+    forwarders {
+        8.8.8.8;
+        8.8.4.4;
+    };
+};

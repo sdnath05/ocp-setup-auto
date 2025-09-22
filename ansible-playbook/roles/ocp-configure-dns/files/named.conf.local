@@ -1,0 +1,14 @@
+zone "." {
+    type hint;
+    file "/usr/share/dns/root.hints";
+};
+
+zone "ocp.local" {
+    type master;
+    file "/etc/bind/zones/db.ocp.local"; # zone file path
+};
+
+zone "56.168.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/zones/db.reverse";  # 192.168.56.0/24 subnet
+};

@@ -1,0 +1,19 @@
+- hosts: "{{ v_host | default('unknown') }}"
+  user: root
+  become: yes
+  vars:
+    hostmachine: "{{ v_host | default('unknown') }}"
+    ocp_version: "4.19"
+    vm_id: 5000
+    vm_name: "rchos-419-cloudimg"
+    vm_memory: 1024
+    cpu_type: "host"
+    cpu_cores: 1
+    disk_size: "50"
+    user: "core"
+    password: "Pass@123"
+    mac: "08:00:27:66:E2:DE"
+  roles:
+    - role: proxmox-create-template-rchos
+
+# ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/hosts -e "v_host=pve2" proxmox-create-ubuntu-template.yaml -kK -vv

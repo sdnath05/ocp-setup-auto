@@ -1,0 +1,9 @@
+- hosts: "{{ v_host | default('proxmox-servers') }}"
+  user: root
+  become: yes
+  vars:
+    hostmachine: "{{ v_host | default('proxmox-servers') }}"
+  roles:
+    - role: ocp-configure-copy-embeded-iso-files
+
+# ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/hosts -e "v_host=ocp-svc" copy-embeded-iso-files.yaml -kK -vv

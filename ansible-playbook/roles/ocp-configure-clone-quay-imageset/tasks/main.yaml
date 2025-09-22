@@ -1,0 +1,48 @@
+- name: "Generating the pull-secret"
+  become: yes
+  shell: |
+    cd {{ script_dir }}
+
+    python3 main.py
+
+- name: "Updating pull-secret.json"
+  become: yes
+  shell: |
+    cd {{ script_dir }}
+
+    python3 updatePullSecret.py -u {{ registry_user }} -p {{ registry_pass }} -d /ocp
+
+- name: "Pulling images to local directory /ocp/data/mirror/images"
+  become: yes
+  shell: |
+    mkdir -p /ocp/data/mirror/images
+
+    oc-mirror \
+      -c /ocp/installer/python-scripts/manifests/imageset-config.yaml \
+      file:///ocp/data/mirror/images \
+      --v2
+  register: clone_output
+
+- name: Saving the output to a file
+  become: yes
+  shell: |-
+    cat > /ocp/clone-local-output.txt << EOF
+    {{ clone_output.stdout }}
+    EOF
+
+- name: "Ingesting images to registry"
+  become: yes
+  shell: |
+    oc-mirror \
+      -c /ocp/installer/python-scripts/manifests/imageset-config.yaml \
+      --from file:///ocp/data/mirror/images \
+      docker://registry.ocp.local:7443/ocp4 \
+      --v2
+  register: clone_output
+
+- name: Saving the output to a file
+  become: yes
+  shell: |-
+    cat > /ocp/clone-local-output-registry.txt << EOF
+    {{ clone_output.stdout }}
+    EOF

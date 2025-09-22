@@ -1,0 +1,17 @@
+network:
+  version: 2
+  ethernets:
+    eth0:
+      renderer: NetworkManager
+      match: {}
+      nameservers:
+        addresses:
+        - 127.0.0.1
+      dhcp4: true
+      dhcp6: true
+      networkmanager:
+        uuid: "626dd384-8b3d-3690-9511-192b2c79b3fd"
+        name: "netplan-eth0"
+        passthrough:
+          connection.timestamp: "<change-me>"
+          proxy._: ""

@@ -1,0 +1,36 @@
+hostname: registry.ocp.local
+http:
+  port: 7080
+https:
+  port: 7443
+  certificate: /ocp/data/ssl/ocp-registry.crt
+  private_key: /ocp/data/ssl/ocp-registry.key
+harbor_admin_password: RandomKey135
+database:
+  password: RandomKey135
+jobservice:
+  max_job_workers: 10
+  job_loggers:
+    - STD_OUTPUT
+    - FILE
+    # - DB
+  logger_sweeper_duration: 1 # days
+cache:
+  enabled: true
+  expire_hours: 24
+trivy:
+  ignore_unfixed: false
+  skip_update: false
+  offline_scan: false
+data_volume: /ocp/registry/harbor
+notification:
+  # Maximum retry count for webhook job
+  webhook_job_max_retry: 5
+  # HTTP client timeout for webhook job
+  webhook_job_http_client_timeout: 30 #seconds
+log:
+  level: debug
+  local:
+    rotate_count: 50
+    rotate_size: 200M
+    location: /var/log/harbor

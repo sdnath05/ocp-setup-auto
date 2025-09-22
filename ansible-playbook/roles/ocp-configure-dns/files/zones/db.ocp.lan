@@ -1,0 +1,37 @@
+$TTL 1W
+@	IN	SOA	ns1.ocp.local. ocp-svc.ocp.local. (
+			2019070700	; serial
+			3H			; refresh (3 hours)
+			30M			; retry (30 minutes)
+			2W			; expiry (2 weeks)
+			1W )		; minimum (1 week)
+	IN	NS		ocp-svc
+	IN	NS		ns1
+	IN	MX 10	smtp
+;
+;
+contact.ocp.local.		IN	A	192.168.56.2
+ns1.ocp.local.			IN	A	192.168.56.2
+cluster.ocp.local.			IN	A	192.168.56.2
+smtp.ocp.local.			IN	A	192.168.56.2
+registry.ocp.local.		IN	A	192.168.56.2
+ocp-svc.ocp.local.		IN	A	192.168.56.2
+;
+helper.ocp.local.			IN	A	192.168.56.2
+helper.cluster.ocp.local.		IN	A	192.168.56.2
+;
+api.cluster.ocp.local.		IN	A	192.168.56.2 
+api-int.cluster.ocp.local.	IN	A	192.168.56.2 
+;
+*.apps.cluster.ocp.local.		IN	A	192.168.56.2
+;
+bootstrap.cluster.ocp.local.	IN	A	192.168.56.100 
+;
+control-plane0.cluster.ocp.local.	IN	A	192.168.56.101 
+control-plane1.cluster.ocp.local.	IN	A	192.168.56.102
+control-plane2.cluster.ocp.local.	IN	A	192.168.56.103
+;
+compute0.cluster.ocp.local.	IN	A	192.168.56.111
+compute1.cluster.ocp.local.	IN	A	192.168.56.112
+;
+;EOF

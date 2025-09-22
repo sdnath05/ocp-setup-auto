@@ -1,0 +1,32 @@
+- name: Installing packages
+  include_tasks: reusable/ubuntu/install.yaml
+  vars:
+    packages:
+      - squid
+
+- name: "Copying {{ item.src }}"
+  become: yes
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - src: "../files/debian.conf"
+      dest: "/etc/squid/conf.d/"
+      mode: "0600"
+
+- name: "Applying changes and starting the squid"
+  become: yes
+  shell: |
+    firewall-cmd --add-service=squid --zone=external --permanent
+    firewall-cmd --add-service=squid --zone=internal --permanent
+    firewall-cmd --add-port=3128/tcp --zone=external --permanent
+    firewall-cmd --add-port=3128/tcp --zone=internal --permanent
+    firewall-cmd --reload
+
+    systemctl enable squid
+    systemctl start squid
+    systemctl status squid
+
+    
+

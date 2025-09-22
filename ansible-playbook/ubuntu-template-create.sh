@@ -1,0 +1,1 @@
+ansible-playbook ./proxmox-create-ubuntu-template.yaml -e @variables/ubuntu-template.yaml -vv

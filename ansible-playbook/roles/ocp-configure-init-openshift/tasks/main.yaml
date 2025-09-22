@@ -1,0 +1,133 @@
+- name: "Pulling the coreos-installer image"
+  become: yes
+  community.docker.docker_image_pull:
+    name: quay.io/coreos/coreos-installer
+    pull: always
+    tag: release
+    platform: amd64
+
+- name: "Downloading rootfs,initramfs and live iso file for version {{ ocp_version }}"
+  become: yes
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    timeout: 300
+  loop:
+    - url: https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.19/latest/rhcos-4.19.0-x86_64-live-initramfs.x86_64.img
+      dest: "/ocp/rchos/rhcos-4.19.0-x86_64-live-initramfs.x86_64.img"
+      mode: '0644'
+    - url: https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/4.19/latest/rhcos-4.19.0-x86_64-live-rootfs.x86_64.img
+      dest: "/ocp/rchos/rhcos-4.19.0-x86_64-live-rootfs.x86_64.img"
+      mode: '0644'
+    - url: https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/latest/rhcos-4.19.0-x86_64-live-iso.x86_64.iso
+      dest: "/ocp/rchos/rhcos-4.19.0-x86_64-live-iso.x86_64.iso"
+      mode: '0644'
+  tags:
+    - download_kernel_file
+
+- name: Get the certificate
+  become: yes
+  shell: |
+    openssl s_client -connect registry.ocp.local:7443 -showcerts </dev/null 2>/dev/null | \
+    awk '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/{ print $0 }'
+  register: cert_data
+
+# - name: "Generating the pull-secret"
+#   become: yes
+#   shell: |
+#     cd {{ script_dir }}
+
+#     python3 main.py
+
+- name: "Cleaning the {{ installer_dir }}"
+  become: yes
+  shell: |
+    rm -rf {{ installer_dir }}
+    mkdir {{ installer_dir }}
+    chmod 750 {{ installer_dir }}
+    chown root:www-data {{ installer_dir }}
+
+- name: "Updating pull-secret.json"
+  become: yes
+  shell: |
+    cd {{ script_dir }}
+
+    python3 updatePullSecretPrivate.py -u {{ registry_user }} -p {{ registry_pass }} -d /ocp
+
+- name: "Generating install-config.yaml"
+  become: yes
+  shell: |
+    cd {{ script_dir }}
+
+    python3 updateYaml.py --public-key /root/.ssh/id_rsa.pub --pull-secret /ocp/pull-secret-private.json --installer-dir /ocp/ocp-setup --cert-file {{ cert_file }}
+
+    sed -i 's/additionalTrustBundle: |-/additionalTrustBundle: |/g' {{ installer_dir }}/install-config.yaml
+  tags:
+    - generate_ocp_install_file
+
+- name: "Generating configuration files for the openshift installation"
+  become: yes
+  shell: |
+    cp {{ installer_dir }}/install-config.yaml /ocp/install-config.yaml.bak
+
+    openshift-install create manifests --dir {{ installer_dir }}
+
+    python3 {{ script_dir }}/updateSchedularYaml.py --schedular-file {{ manifest_dir }}/cluster-scheduler-02-config.yml
+
+    openshift-install create ignition-configs --dir {{ installer_dir }}
+
+    export filepath="/ocp/ocp-setup"
+    chown -R $USER:www-data $filepath
+
+    # 750 permision to folder and 640 to files
+    find $filepath -type d -exec chmod u=rwx,g=rx,o= '{}' \;
+    find $filepath -type f -exec chmod u=rw,g=r,o= '{}' \;
+  when: (generate_ign is defined) and (generate_ign | bool)
+
+- name: "Generating embeded iso files for the bootstrap, master and worker node"
+  become: yes
+  shell: |
+    rm -rf /ocp/rchos/rhcos-4.19.0-x86_64-live-iso-{{ item }}.iso
+
+    docker run --rm -v \
+      /ocp:/data quay.io/coreos/coreos-installer:release \
+      iso ignition embed \
+      -i /data/ocp-setup/{{ item }}.ign \
+      /data/rchos/rhcos-4.19.0-x86_64-live-iso.x86_64.iso \
+      -o /data/rchos/rhcos-4.19.0-x86_64-live-iso-{{ item }}.iso
+  loop:
+    - "bootstrap"
+    - "master"
+    - "worker"
+  when: (generate_ign is defined) and (generate_ign | bool)
+  tags:
+    - generate_ocp_iso_files
+
+- name: "Fixing file permissions for the rchos directory"
+  become: yes
+  shell: |
+    export filepath="/ocp/rchos"
+    chown -R $USER:www-data $filepath
+
+    # 750 permision to folder and 640 to files
+    find $filepath -type d -exec chmod u=rwx,g=rx,o= '{}' \;
+    find $filepath -type f -exec chmod u=rw,g=r,o= '{}' \;
+
+# sudo coreos-installer install --ignition-url=http://192.168.1.16:8083/ocp-setup/<node_type>.ign <device>
+# sudo coreos-installer install /dev/sda --ignition-url=http://192.168.1.16:8083/ocp-setup/bootstrap.ign --insecure-ignition
+# sudo coreos-installer install /dev/sda --ignition-url=http://192.168.1.16:8083/ocp-setup/master.ign --insecure-ignition
+# sudo coreos-installer install /dev/sda -I http://192.168.1.16:8083/ocp-setup/worker.ign --insecure-ignition --insecure --console=tty0 --copy-network
+
+
+# to approve all pending csr's
+# oc get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | xargs --no-run-if-empty oc adm certificate approve
+
+# rhcos iso file
+# https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/latest/rhcos-4.19.0-x86_64-live-iso.x86_64.iso
+
+# Solution: api to download pull-secret
+# https://access.redhat.com/solutions/4844461
+
+# get the offline token
+# https://console.redhat.com/openshift/token/show

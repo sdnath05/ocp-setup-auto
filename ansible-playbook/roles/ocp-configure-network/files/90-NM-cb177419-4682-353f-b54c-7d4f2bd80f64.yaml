@@ -1,0 +1,19 @@
+network:
+  version: 2
+  ethernets:
+    ens19:
+      renderer: NetworkManager
+      match: {}
+      addresses:
+      - "192.168.56.2/24"
+      nameservers:
+        addresses:
+        - 127.0.0.1
+      networkmanager:
+        uuid: "cb177419-4682-353f-b54c-7d4f2bd80f64"
+        name: "netplan-ens19"
+        passthrough:
+          ipv4.dns-search: "ocp.local;"
+          # ipv4.ignore-auto-dns: "true"
+          ipv4.never-default: "true"
+          proxy._: ""

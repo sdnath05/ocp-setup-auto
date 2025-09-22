@@ -1,0 +1,6 @@
+v_host: "ocp-svc"
+create_ssl: false
+create_partition_table: false
+mount_data_partition: true
+data_partition_device: "/dev/sdb"
+data_partition_mount_point: "/dev/sdb1"

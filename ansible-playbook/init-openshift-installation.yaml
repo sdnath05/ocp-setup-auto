@@ -1,0 +1,17 @@
+- hosts: "{{ v_host | default('ocp-svc') }}"
+  user: ocp
+  become: yes
+  vars:
+    hostmachine: "{{ v_host | default('ocp-svc') }}"
+    LOCAL_SECRET_JSON: "/ocp/pull-secret.json"
+    bin_path: "/ocp/installer"
+    installer_dir: "/ocp/ocp-setup"
+    manifest_dir: /ocp/ocp-setup/manifests
+    cert_file: /ocp/data/ssl/ocp-registry.crt
+    script_dir: /ocp/installer/python-scripts
+    registry_user: "admin"
+    registry_pass: "RandomKey135"
+  roles:
+    - role: ocp-configure-init-openshift
+
+# ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i inventory/hosts -e "v_host=ocp-svc" init-openshift-installation.yaml -kK -vv

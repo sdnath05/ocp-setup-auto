@@ -1,0 +1,1 @@
+ansible-playbook ./proxmox-create-rchos-template.yaml -e @variables/rchos.yaml -vv

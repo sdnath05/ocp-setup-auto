@@ -1,0 +1,55 @@
+- name: "Truncate /root/.ssh/known_hosts"
+  become: yes
+  shell: |
+    truncate -s 0 /root/.ssh/known_hosts
+
+- name: "Creating the coreos bootable in /dev/sda for {{ machine_type }}"
+  become: yes
+  shell: |
+    ssh core@{{ item.ip }} \
+      -o StrictHostKeyChecking=no \
+      -o RemoteCommand="sudo coreos-installer install /dev/sda \
+      --ignition-url=http://192.168.56.2:8083/ocp-setup/{{ item.type }}.ign \
+      --insecure-ignition \
+      --insecure \
+      && sudo reboot"
+  loop:
+    - type: "bootstrap"
+      ip: 192.168.56.100
+  when: (machine_type is defined) and (machine_type == "bootstrap")
+
+- name: "Creating the coreos bootable in /dev/sda for {{ machine_type }}"
+  become: yes
+  shell: |
+    ssh core@{{ item.ip }} \
+      -o StrictHostKeyChecking=no \
+      -o RemoteCommand="sudo coreos-installer install /dev/sda \
+      --ignition-url=http://192.168.56.2:8083/ocp-setup/{{ item.type }}.ign \
+      --insecure-ignition \
+      --insecure \
+      && sudo reboot"
+  loop:
+    - type: "master"
+      ip: 192.168.56.101
+    - type: "master"
+      ip: 192.168.56.102
+    - type: "master"
+      ip: 192.168.56.103
+  when: (machine_type is defined) and (machine_type == "master")
+
+- name: "Creating the coreos bootable in /dev/sda for {{ machine_type }}"
+  become: yes
+  shell: |
+    ssh core@{{ item.ip }} \
+      -o StrictHostKeyChecking=no \
+      -o RemoteCommand="sudo coreos-installer install /dev/sda \
+      --ignition-url=http://192.168.56.2:8083/ocp-setup/{{ item.type }}.ign \
+      --insecure-ignition \
+      --insecure \
+      && sudo reboot"
+  loop:
+    - type: "worker"
+      ip: 192.168.56.111
+    - type: "worker"
+      ip: 192.168.56.112
+  when: (machine_type is defined) and (machine_type == "worker")

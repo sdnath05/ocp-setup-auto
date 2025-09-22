@@ -1,0 +1,23 @@
+$TTL 1W
+@	IN	SOA	ns1.ocp.local. ocp-svc.ocp.local. (
+			2019070700	; serial
+			3H		; refresh (3 hours)
+			30M		; retry (30 minutes)
+			2W		; expiry (2 weeks)
+			1W )	; minimum (1 week)
+	IN	NS	ocp-svc.ocp.local.
+	IN	NS	ns1.ocp.local.
+;
+1.56.168.192.in-addr.arpa.	IN	PTR	api.cluster.ocp.local. 
+1.56.168.192.in-addr.arpa.	IN	PTR	api-int.cluster.ocp.local. 
+;
+100.56.168.192.in-addr.arpa.	IN	PTR	bootstrap.cluster.ocp.local. 
+;
+101.56.168.192.in-addr.arpa.	IN	PTR	control-plane0.cluster.ocp.local. 
+102.56.168.192.in-addr.arpa.	IN	PTR	control-plane1.cluster.ocp.local. 
+103.56.168.192.in-addr.arpa.	IN	PTR	control-plane2.cluster.ocp.local. 
+;
+111.56.168.192.in-addr.arpa.	IN	PTR	compute0.cluster.ocp.local. 
+112.56.168.192.in-addr.arpa.	IN	PTR	compute1.cluster.ocp.local. 
+;
+;EOF

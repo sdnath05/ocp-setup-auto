@@ -1,0 +1,15 @@
+[IF full shutdown]
+
+1. If Port 6443 is running but port 22623 is not or getting similar error check the pending 
+certificate requests using command -
+
+`oc get csr`
+
+2. IF certificate approval is pending then run this (do this untill there aren't any certificate approval pending left)
+
+`oc get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | xargs oc adm certificate approve`
+
+
+3. Need to re-apply the admin user creation -
+
+oc apply -f oauth-htpasswd.yaml

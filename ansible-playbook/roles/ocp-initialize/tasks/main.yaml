@@ -1,0 +1,213 @@
+- name: Changing timezone to Asia/Kolkata
+  become: yes
+  shell: |
+    timedatectl set-timezone Asia/Kolkata
+    timedatectl set-ntp true
+
+- name: Installing packages
+  include_tasks: reusable/ubuntu/install.yaml
+  vars:
+    packages:
+      - python3-pip
+      - python3-full
+      - cron
+      - jq
+      # Required for oc-mirror
+      - libgpgme11
+      - vim
+
+- name: create a partition table
+  become: yes
+  shell: |
+    # Create a new partition table on {{ data_partition_device }}
+    parted -s -a optimal {{ data_partition_device }} mklabel gpt
+    
+    # Create a primary partition that uses the entire disk
+    parted -s -a optimal {{ data_partition_device }} -- mkpart primary ext4 2048s 100%
+    
+    # Format the partition as ext4
+    mkfs.ext4 {{ data_partition_mount_point }}
+  when: (create_partition_table is defined) and (create_partition_table | bool)
+  tags:
+    - create_partition_table
+
+- name: Create a mount point /ocp
+  become: yes
+  file:
+    state: directory
+    path: /ocp
+    mode: '777'
+    recurse: yes
+    owner: root
+    group: root
+
+- name: "Get UUID of {{ data_partition_mount_point }}"
+  become: yes
+  shell: blkid -s UUID -o value {{ data_partition_mount_point }}
+  register: sdb1_uuid
+
+- name: "Mount {{ data_partition_mount_point }} to /ocp using UUID"
+  become: yes
+  shell: mount -o defaults UUID={{ sdb1_uuid.stdout }} /ocp
+  when: (mount_data_partition is defined) and (mount_data_partition | bool)
+  tags:
+    - mount_data_partition
+
+- name: Add UUID entry into /etc/fstab
+  become: yes
+  lineinfile:
+    path: /etc/fstab
+    state: present
+    regexp: '^UUID=.*\s+/ocp\s+ext4\s+defaults\s+0\s+0'
+    line: "UUID={{ sdb1_uuid.stdout }} /ocp ext4 defaults 0 0"
+  when: (mount_data_partition is defined) and (mount_data_partition | bool)
+
+- name: "Copying crontab file"
+  become: yes
+  copy:
+    src: "../files/crontab-root"
+    dest: "/var/spool/cron/crontabs/root"
+    mode: "0600"
+    directory_mode: no
+
+- name: Create work directory if it does not exist
+  become: yes
+  file:
+    state: directory
+    path: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+    recurse: yes
+    owner: root
+    group: root
+  loop:
+    - path: /ocp/data
+      mode: '777'
+    - path: /ocp/data/ssl
+      mode: '755'
+    - path: /ocp/registry/quayroot
+      mode: '755'
+    - path: /ocp/registry/quaystorage
+      mode: '755'
+    - path: /ocp/registry/sqlitestorage
+      mode: '755'
+    - path: /ocp/installer
+      mode: '755'
+    - path: /ocp/ocp-setup
+      mode: '755'
+    - path: /ocp/registry/harbor
+      mode: '755'
+    - path: /ocp/rchos
+      mode: '750'
+
+- name: "Downloading files {{ ocp_version }}"
+  become: yes
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    timeout: 300
+  loop:
+    - url: https://mirror.openshift.com/pub/openshift-v4/multi/clients/ocp/{{ ocp_version }}/amd64/openshift-install-linux.tar.gz
+      dest: /ocp/installer/openshift-install-linux.tar.gz
+      mode: '0644'
+    - url: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/{{ ocp_version }}/openshift-client-linux.tar.gz
+      dest: /ocp/installer/openshift-client-linux.tar.gz
+      mode: '0644'
+    - url: https://mirror.openshift.com/pub/cgw/mirror-registry/latest/mirror-registry-amd64.tar.gz
+      dest: /ocp/installer/mirror-registry-amd64.tar.gz
+      mode: '0644'
+    # - url: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/{{ ocp_version }}/oc-mirror.tar.gz
+    #   dest: /ocp/installer/oc-mirror.tar.gz
+    #   mode: '0644'
+    - url: https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/{{ ocp_version }}/oc-mirror.rhel9.tar.gz
+      dest: /ocp/installer/oc-mirror.rhel9.tar.gz
+      mode: '0644'
+    - url: https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{{ ocp_version }}/opm-linux.tar.gz
+      dest: /ocp/installer/opm-linux.tar.gz
+      mode: '0644'
+    - url: https://github.com/goharbor/harbor-cli/releases/download/v0.0.8/harbor-cli_0.0.8_linux_amd64.deb
+      dest: /ocp/installer/harbor-cli_0.0.8_linux_amd64.deb
+      mode: '0644'
+  register: _create_instances
+  async: 3600 # Run the task asynchronously for up to 1 hour (3600 seconds)
+  poll: 0
+  tags:
+    - download_files
+
+- name: "Waiting for downloads to finish"
+  async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: _jobs
+  until: _jobs.finished
+  delay: 10  # Check every 10 seconds. Adjust as you like.
+  retries: 100  # Retry up to 100 times. Adjust as needed.
+  with_items: "{{ _create_instances.results }}"
+
+- name: "Copying python scripts and ocm"
+  become: yes
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    directory_mode: "{{ item.directory_mode }}"
+  loop:
+    - src: "../../../python-scripts/"
+      dest: "/ocp/installer/python-scripts/"
+      mode: "0755"
+      directory_mode: yes
+    - src: "../files/ocm_linux_amd64.zip"
+      dest: "/ocp/installer/"
+      mode: "0755"
+      directory_mode: no
+  tags:
+    - copy_python_scripts
+    - configure_python
+
+- name: "Unarchiving files"
+  become: yes
+  unarchive:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    remote_src: yes
+  loop:
+    - src: /ocp/installer/openshift-install-linux.tar.gz
+      dest: /usr/local/bin/
+      mode: '0755'
+    - src: /ocp/installer/openshift-client-linux.tar.gz
+      dest: /usr/local/bin/
+      mode: '0755'
+    - src: /ocp/installer/mirror-registry-amd64.tar.gz
+      dest: /usr/local/bin/
+      mode: '0755'
+    - src: /ocp/installer/oc-mirror.rhel9.tar.gz
+      dest: /usr/local/bin/
+      mode: '0755'
+    - src: /ocp/installer/ocm_linux_amd64.zip
+      dest: /usr/local/bin/
+      mode: '0755'
+    - src: /ocp/installer/opm-linux.tar.gz
+      dest: /usr/local/bin/
+      mode: '0755'
+  tags:
+    - Unarchive_files
+
+- name: Creating .env file for the python scripts
+  become: yes
+  shell: |
+    cat > /ocp/installer/python-scripts/.env << EOF
+    SSO_URL=""
+    OFFLINE_ACCESS_TOKEN="{{ OFFLINE_ACCESS_TOKEN }}"
+    EXECUTABLE_PATH="/usr/local/bin"
+    OUT_DIR="/ocp"
+    PULL_SECRET_URL="https://api.openshift.com/api/accounts_mgmt/v1/access_token"
+    EOF
+
+    cd /ocp/installer/python-scripts
+    python3 -m pip config set global.break-system-packages true
+    pip3 install -r requirements.txt
+
+    # python3 -m venv ocp
+    # ./ocp/bin/pip install -r requirements.txt
+  tags:
+    - configure_python

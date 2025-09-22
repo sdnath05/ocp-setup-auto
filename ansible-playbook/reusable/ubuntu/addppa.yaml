@@ -1,0 +1,7 @@
+- name: "Installing package {{ package }}"
+  become: true
+  apt_repository:
+    repo: "{{ package }}"
+    state: present
+    update_cache: true
+    validate_certs: true
