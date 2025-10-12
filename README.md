@@ -187,7 +187,7 @@ Terraform provider Link - https://registry.terraform.io/providers/Telmate/proxmo
    ```bash
    cd /root
 
-   git clone https://github.com/sdnath05/ocp-setup.git
+   git clone https://github.com/sdnath05/ocp-setup-auto.git
 
    cp -r ./ocp-setup/python-scripts /ocp/installer/
    ```
