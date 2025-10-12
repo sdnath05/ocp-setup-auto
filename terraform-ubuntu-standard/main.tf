@@ -12,7 +12,7 @@ provider "proxmox" {
     # if passthrough is used then only root can do the operation
     pm_user             = "root@pam"
     pm_password         = "Asdf@135"
-    alias               = "pve1_root"
+    # alias               = "pve1_root"
     pm_api_url          = "https://192.168.0.140:8006/api2/json"
     # pm_api_token_id     = "root@pam!root"
     # pm_api_token_secret = "a41415dc-2082-4671-9946-bcfe2a50f61d"
@@ -32,15 +32,14 @@ variable "ubuntu" {
   default = {
     "vmid"          = 200
     "vmname"        = "ubuntu-ocp-svc"
-    "memory"        = 8192
+    "memory"        = 16384
     "nodename"      = "pve1"
     "numcpus"       = 4
     "size"          = "200G"
     "macaddr"       = "BC:24:11:C6:26:65"
-    "template"      = "ubuntu-2404-cloudimg"
     "add_disk"      = false
     "storage_group" = "local-lvm"
-    "data_disk"     = "/dev/disk/by-id/nvme-CT1000E100SSD8_2523EAD4658C"
+    # "data_disk"     = "/dev/disk/by-id/nvme-CT1000E100SSD8_2523EAD4658C"
   }
 }
 
