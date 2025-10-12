@@ -1,6 +1,8 @@
 v_host: "ocp-svc"
-create_ssl: false
+INTERNET_INTERFACE: "eth0"
+OCP_INTERFACE: "ens19"
+create_ssl: true
 create_partition_table: false
-mount_data_partition: true
+mount_data_partition: false
 data_partition_device: "/dev/sdb"
 data_partition_mount_point: "/dev/sdb1"

@@ -12,10 +12,10 @@ provider "proxmox" {
     # if passthrough is used then only root can do the operation
     pm_user             = "root@pam"
     pm_password         = "Asdf@135"
-    # alias               = "pve1_root"
     pm_api_url          = "https://192.168.0.140:8006/api2/json"
     # pm_api_token_id     = "root@pam!root"
     # pm_api_token_secret = "a41415dc-2082-4671-9946-bcfe2a50f61d"
+    # alias               = "pve1_root"
     pm_tls_insecure     = true
 
     pm_log_file         = "terraform-plugin-proxmox.log"
@@ -35,7 +35,7 @@ variable "ubuntu" {
     "memory"        = 16384
     "nodename"      = "pve1"
     "numcpus"       = 4
-    "size"          = "200G"
+    "size"          = "300G"
     "macaddr"       = "BC:24:11:C6:26:65"
     "add_disk"      = false
     "storage_group" = "local-lvm"

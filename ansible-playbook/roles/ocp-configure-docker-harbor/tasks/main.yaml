@@ -201,6 +201,8 @@
 
     cat /ocp/pull-secret.json | jq > /root/.docker/config.json
 
+    sleep 5s
+
     docker login \
       -u {{ registry_user }} \
       -p {{ registry_pass }} \

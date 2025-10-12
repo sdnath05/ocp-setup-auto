@@ -38,7 +38,7 @@ Terraform provider Link - https://registry.terraform.io/providers/Telmate/proxmo
    - **Name:** `ocp-svc`
    - **No of cpu:** `4`
    - **Memory:** `16GB`
-   - **Storage:** `200GB HDD`
+   - **Storage:** `300GB HDD`
    - **Network1:** NIC1 connected to the **`internet`** network **`(192.168.0.0/24)`**
    - **Network2:** NIC2 connected to the **`ocp`** network **`(192.168.56.0/24)`**
    - Load the **`ubuntu-24.04.3-live-server-amd64.iso`** image into the CD/DVD drive
@@ -110,7 +110,7 @@ Terraform provider Link - https://registry.terraform.io/providers/Telmate/proxmo
    # 
    # m h  dom mon dow   command
 
-   @reboot sleep 60s && docker start `docker ps -aq -f "status=exited"`
+   @reboot sleep 60s && docker start \`docker ps -aq -f "status=exited"\`
    EOF
    ```
 
@@ -158,13 +158,14 @@ Terraform provider Link - https://registry.terraform.io/providers/Telmate/proxmo
          ```bash
          wget -P /ocp/installer https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.19.4/oc-mirror.rhel9.tar.gz
          tar -xzf /ocp/installer/oc-mirror.rhel9.tar.gz -C /usr/local/bin
+         chmod 755 /usr/local/bin/oc-mirror
          ```
       - [opm Linux](#)
          ```bash
          wget -P /ocp/installer https://mirror.openshift.com/pub/openshift-v4/clients/ocp/4.19.4/opm-linux.tar.gz
          tar -xzf /ocp/installer/opm-linux.tar.gz -C /usr/local/bin
          ```
-      - Pull secret (Need to download from the dashboard or using [automation](#))
+      - Pull secret (Need to download from the dashboard or using [automation](#create-the-env-file))
       - [Red Hat Enterprise Linux CoreOS (RHCOS)](#)
          ```bash
          wget -P /ocp/rchos https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/latest/rhcos-4.19.0-x86_64-live-iso.x86_64.iso
@@ -200,7 +201,7 @@ Terraform provider Link - https://registry.terraform.io/providers/Telmate/proxmo
    unzip ./ocp-setup/ansible-playbook/roles/ocp-initialize/files/ocm_linux_amd64.zip -d /usr/local/bin
    ```
 
-1. **Create the .env file**
+1. **Create the env file**
 
    Get offline token from [here](https://console.redhat.com/openshift/token)
    ```bash
@@ -224,6 +225,12 @@ Terraform provider Link - https://registry.terraform.io/providers/Telmate/proxmo
    1. **Install Packages**
       ```bash
       apt-get install -y network-manager firewalld
+      ```
+   1. **Create Interface Environment variables**
+      ```bash
+      # need to change the values according to your interfaces
+      export INTERNET_INTERFACE="ens18"
+      export OCP_INTERFACE="ens19"
       ```
 
    1. **Copy Network files**
@@ -249,7 +256,12 @@ Terraform provider Link - https://registry.terraform.io/providers/Telmate/proxmo
       [ -f /etc/NetworkManager/NetworkManager.conf ] && \
       cp /etc/NetworkManager/NetworkManager.conf /etc/NetworkManager/NetworkManager.conf.bak
 
+      # internet interface
       sed -i -e "s/<change-me>/$(date +%s)/g" /etc/netplan/90-NM-626dd384-8b3d-3690-9511-192b2c79b3fd.yaml
+      sed -i -e "s/name\: \"netplan-eth0\"/name\: \"netplan-${INTERNET_INTERFACE}\"/g" /etc/netplan/90-NM-626dd384-8b3d-3690-9511-192b2c79b3fd.yaml
+      sed -i -e "s/set-name\: \"eth0\"/set-name\: \"${INTERNET_INTERFACE}\"/g" /etc/netplan/50-cloud-init.yaml
+      # ocp interface
+      sed -i -e "s/name\: \"netplan-ens19\"/name\: \"netplan-${OCP_INTERFACE}\"/g" /etc/netplan/90-NM-cb177419-4682-353f-b54c-7d4f2bd80f64.yaml
       ```
 
    1. **Apply changes and restart the network**
@@ -262,11 +274,8 @@ Terraform provider Link - https://registry.terraform.io/providers/Telmate/proxmo
 
    1. **Configure internal and external zone and set masquerade**
       ```bash
-      export ocp_ethernet="ens19"
-      export internet_ethernet="eth0"
-
-      nmcli connection modify netplan-${ocp_ethernet} connection.zone internal
-      nmcli connection modify netplan-${internet_ethernet} connection.zone external
+      nmcli connection modify netplan-${OCP_INTERFACE} connection.zone internal
+      nmcli connection modify netplan-${INTERNET_INTERFACE} connection.zone external
       systemctl restart NetworkManager
 
       systemctl disable systemd-networkd-wait-online.service
@@ -901,7 +910,7 @@ Terraform provider Link - https://registry.terraform.io/providers/Telmate/proxmo
 1. Create the persistent volume for the 'image-registry-storage' pvc to bind to
 
    ```bash
-   oc create -f /ocp/installer/python-scripts/manifest/registry-pv.yaml
+   oc create -f /ocp/installer/python-scripts/manifests/registry-pv.yaml
    ```
 
 1. After a short wait the 'image-registry-storage' pvc should now be bound
@@ -914,10 +923,10 @@ Terraform provider Link - https://registry.terraform.io/providers/Telmate/proxmo
 
 1. Apply the `oauth-htpasswd.yaml` file to the cluster.
 
-   > This will create a user 'admin' with the password 'password'. To set a different username and password substitue the htpasswd key in the '/ocp/installer/python-scripts/manifest/oauth-htpasswd.yaml' file with the output of `htpasswd -n -B -b <username> <password>`
+   > This will create a user 'admin' with the password 'password'. To set a different username and password substitue the htpasswd key in the '/ocp/installer/python-scripts/manifests/oauth-htpasswd.yaml' file with the output of `htpasswd -n -B -b <username> <password>`
 
    ```bash
-   oc apply -f /ocp/installer/python-scripts/manifest/oauth-htpasswd.yaml
+   oc apply -f /ocp/installer/python-scripts/manifests/oauth-htpasswd.yaml
    ```
 
 1. Assign the new user (admin) admin permissions

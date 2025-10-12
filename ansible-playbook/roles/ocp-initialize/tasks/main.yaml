@@ -8,6 +8,17 @@
   include_tasks: reusable/ubuntu/install.yaml
   vars:
     packages:
+      - build-essential
+      - rsyslog
+      - net-tools
+      - netcat-openbsd
+      - zip
+      - unzip
+      - nano
+      - ca-certificates
+      - git
+      - acl
+      - iputils-ping
       - python3-pip
       - python3-full
       - cron
@@ -44,6 +55,7 @@
 - name: "Get UUID of {{ data_partition_mount_point }}"
   become: yes
   shell: blkid -s UUID -o value {{ data_partition_mount_point }}
+  when: (mount_data_partition is defined) and (mount_data_partition | bool)
   register: sdb1_uuid
 
 - name: "Mount {{ data_partition_mount_point }} to /ocp using UUID"

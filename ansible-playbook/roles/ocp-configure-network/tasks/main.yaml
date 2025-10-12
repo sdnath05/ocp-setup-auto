@@ -41,7 +41,12 @@
     [ -f /etc/NetworkManager/NetworkManager.conf ] && \
     cp /etc/NetworkManager/NetworkManager.conf /etc/NetworkManager/NetworkManager.conf.bak
 
+    # internet interface
     sed -i -e "s/<change-me>/$(date +%s)/g" /etc/netplan/90-NM-626dd384-8b3d-3690-9511-192b2c79b3fd.yaml
+    sed -i -e "s/name\: \"netplan-eth0\"/name\: \"netplan-{{ INTERNET_INTERFACE }}\"/g" /etc/netplan/90-NM-626dd384-8b3d-3690-9511-192b2c79b3fd.yaml
+    sed -i -e "s/set-name\: \"eth0\"/set-name\: \"{{ INTERNET_INTERFACE }}\"/g" /etc/netplan/50-cloud-init.yaml
+    # ocp interface
+    sed -i -e "s/name\: \"netplan-ens19\"/name\: \"netplan-{{ OCP_INTERFACE }}\"/g" /etc/netplan/90-NM-cb177419-4682-353f-b54c-7d4f2bd80f64.yaml
 
 - name: "Applying changes and restarting the network"
   become: yes
@@ -54,8 +59,8 @@
 - name: "Setting internal and external zone and setting masquerade"
   become: yes
   shell: |
-    nmcli connection modify netplan-{{ ocp_ethernet }} connection.zone internal
-    nmcli connection modify netplan-{{ internet_ethernet }} connection.zone external
+    nmcli connection modify netplan-{{ OCP_INTERFACE }} connection.zone internal
+    nmcli connection modify netplan-{{ INTERNET_INTERFACE }} connection.zone external
     sudo systemctl restart NetworkManager
 
     systemctl disable systemd-networkd-wait-online.service

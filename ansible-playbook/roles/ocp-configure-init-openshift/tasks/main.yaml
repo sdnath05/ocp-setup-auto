@@ -1,5 +1,6 @@
 - name: "Pulling the coreos-installer image"
   become: yes
+  when: (generate_embeded is defined) and (generate_embeded | bool)
   community.docker.docker_image_pull:
     name: quay.io/coreos/coreos-installer
     pull: always
@@ -23,6 +24,7 @@
     - url: https://mirror.openshift.com/pub/openshift-v4/x86_64/dependencies/rhcos/latest/rhcos-4.19.0-x86_64-live-iso.x86_64.iso
       dest: "/ocp/rchos/rhcos-4.19.0-x86_64-live-iso.x86_64.iso"
       mode: '0644'
+  when: (generate_embeded is defined) and (generate_embeded | bool)
   tags:
     - download_kernel_file
 
@@ -100,7 +102,7 @@
     - "bootstrap"
     - "master"
     - "worker"
-  when: (generate_ign is defined) and (generate_ign | bool)
+  when: (generate_embeded is defined) and (generate_embeded | bool)
   tags:
     - generate_ocp_iso_files
 
